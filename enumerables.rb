@@ -39,7 +39,7 @@ module Enumerable
       end
       false
     end
-    
+
     def my_count(obj = nil)
       count = 0
       my_each do |e|
@@ -49,3 +49,24 @@ module Enumerable
       end
       return count unless block_given?
     end
+    
+    def my_map(&block)
+      arr = []
+      my_each do |e|
+        arr << block.call(e)
+      end
+      arr
+    end
+
+    def my_inject
+      memo = self[0]
+      my_each do |e|
+        memo = yield(memo, e)
+      end
+      memo
+    end
+  end
+
+  def multiply_els(arr)
+    arr.my_inject { |memo, e| memo * e }
+  end
