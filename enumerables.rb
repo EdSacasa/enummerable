@@ -24,3 +24,18 @@ module Enumerable
       end
       true
     end
+    def my_any?
+      my_each do |e|
+        return true if yield(e)
+      end
+      false
+    end
+
+    def my_none?
+      return true unless block_given?
+
+      my_each do |e|
+        return true unless yield(e)
+      end
+      false
+    end
