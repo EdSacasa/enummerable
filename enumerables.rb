@@ -1,72 +1,72 @@
 module Enumerable
-    def my_each
-      for i in 0...self.length
-        yield(self[i])
-      end
-    end
-
-    def my_each_with_index
-        for i in 0...self.length
-            yield(self[i], i)
-        end
-    end
-    def my_select
-      output = []
-      my_each do |e|
-        output << e if yield(e)
-      end
-      return output
-    end
-
-    def my_all?
-      my_each do |e|
-        return false unless yield(e)
-      end
-      true
-    end
-    def my_any?
-      my_each do |e|
-        return true if yield(e)
-      end
-      false
-    end
-
-    def my_none?
-      return true unless block_given?
-
-      my_each do |e|
-        return true unless yield(e)
-      end
-      false
-    end
-
-    def my_count(obj = nil)
-      count = 0
-      my_each do |e|
-        count += 1
-        return count if obj && count == obj
-        return count if block_given? && yield(e)
-      end
-      return count unless block_given?
-    end
-    
-    def my_map(&block)
-      arr = []
-      my_each do |e|
-        arr << block.call(e)
-      end
-      arr
-    end
-
-    def my_inject
-      memo = self[0]
-      my_each do |e|
-        memo = yield(memo, e)
-      end
-      memo
+  def my_each
+    index = 0
+    while index < self.length
+      yield(self[index])
+      index += 1
     end
   end
 
-  def multiply_els(arr)
-    arr.my_inject { |memo, e| memo * e }
+  def my_each_with_index
+    index = 0
+    while index < self.length
+      yield(self[index],index)
+      index += 1
+    end
   end
+
+  def my_select
+    new_arr = Array.new()
+    self.my_each {|elem| new_arr << elem if yield(elem)}
+    new_arr
+  end
+
+  def my_all?
+    result = false
+    self.my_each {|elem| yield(elem) ? result = true : result = false }
+    result
+  end
+
+  def my_any?
+    result = false
+    self.my_each {|elem| result = true if yield(elem)}
+    result
+  end
+
+  def my_none?
+    result = true
+    self.my_each {|elem| result = false if yield(elem)}
+    result
+  end
+
+  def my_count num = nil
+    count = 0
+      if num
+        self.my_each {|elem| count += 1 if elem == num}
+      elsif block_given?
+        self.my_each {|elem| count += 1 if yield(elem)}
+      else
+        count = self.length
+      end
+    count
+  end
+
+  def my_map block = nil
+    new_arr = Array.new()
+    if block
+      self.my_each_with_index {|elem,index| new_arr[index] = block.call(elem)}
+    else
+      self.my_each_with_index {|elem,index| new_arr[index] = yield(elem)}
+    end
+    new_arr
+  end
+
+  def my_inject initial = nil
+    initial == nil ? result = self[0] : result = initial
+
+    for i in 1..self.length - 1
+      result = yield(result,self[i])
+    end
+    result
+  end
+end
